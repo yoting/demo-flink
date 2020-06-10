@@ -6,6 +6,7 @@ import org.apache.flink.api.java.utils.ParameterTool;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
+
 public class SocketWindowWordCount {
 	public static void main(String[] args) throws Exception {
 		// the host and the port to connect to
@@ -14,7 +15,7 @@ public class SocketWindowWordCount {
 		try {
 			final ParameterTool params = ParameterTool.fromArgs(args);
 			hostname = params.has("hostname") ? params.get("hostname") : "localhost";
-			port = params.has("port") ? params.getInt("port"):9000;
+			port = params.has("port") ? params.getInt("port") : 9000;
 		} catch (Exception e) {
 			System.err.println("No port specified. Please run 'SocketWindowWordCount " +
 					"--hostname <hostname> --port <port>', where hostname (localhost by default) " +
@@ -33,28 +34,36 @@ public class SocketWindowWordCount {
 					public void flatMap(String value, Collector<WordWithCount> out) {
 						for (String word : value.split("\\s")) {
 							out.collect(new WordWithCount(word, 1L));
-						} }})
+						}
+					}
+				})
 				.keyBy("word")
-//				.timeWindow(Time.seconds(5))
+				// .timeWindow(Time.seconds(5))
 				.reduce(new ReduceFunction<WordWithCount>() {
 					public WordWithCount reduce(WordWithCount a, WordWithCount b) {
 						return new WordWithCount(a.word, a.count + b.count);
-					}});
+					}
+				});
 		// print the results with a single thread, rather than in parallel
 		windowCounts.print();//.setParallelism(2);
 		env.execute("Socket Window WordCount");
 	}
+
 	/**
 	 * Data type for words with count.
 	 */
 	public static class WordWithCount {
 		public String word;
 		public long count;
-		public WordWithCount() {}
+
+		public WordWithCount() {
+		}
+
 		public WordWithCount(String word, long count) {
 			this.word = word;
 			this.count = count;
 		}
+
 		@Override
 		public String toString() {
 			return word + " : " + count;

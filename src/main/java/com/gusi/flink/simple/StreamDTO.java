@@ -1,12 +1,16 @@
 package com.gusi.flink.simple;
 
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
 public class StreamDTO {
 	private String dtoId;
 	private double value;
 	private long timestamp;
 
 	public StreamDTO() {
+		Executors
 	}
 
 	public StreamDTO(String dtoId, double value, long timestamp) {
